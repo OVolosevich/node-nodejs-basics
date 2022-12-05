@@ -1,5 +1,32 @@
+import fs, { createReadStream, createWriteStream } from 'fs';
+import zlib from 'zlib';
+
 const decompress = async () => {
-    // Write your code here 
+    const compressFilePath = './src/zip/files/archive.gz'; 
+    const decompressFilePath = './src/zip/files/fileToCompress.txt';
+    
+    const isFileExist = async (path) => {
+        try {
+            await fs.promises.access(path);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const decompressFile = async (path, archive) => {
+        const handleStream = createReadStream(archive)
+        handleStream
+            .pipe(zlib.createGunzip())
+            .pipe(createWriteStream(path))
+            .on('finish', () => {
+                console.log(`Decompression process done: ${path}`)
+            }
+        )
+    }
+
+    await isFileExist(compressFilePath) ? decompressFile(decompressFilePath, compressFilePath) : console.log(errorMessage);
+
 };
 
 await decompress();
